@@ -32,7 +32,10 @@ const ProfileScreen = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         console.log(image);
-        if (password !== confirmPassword) {
+        if (!name.match(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/)) {
+            toast.error("Invalid name!");
+        }
+        else if (password !== confirmPassword) {
             toast.error("Passwords doesn't match!");
         } else {
             try {
@@ -56,7 +59,7 @@ const ProfileScreen = () => {
     };
     return (
         <FormContainer>
-            <h1>Update Profile</h1>
+            <h1 className="text-center">Update Profile</h1>
 
             <Form onSubmit={submitHandler} >
                 <Form.Group className="my-2" controlId="name">

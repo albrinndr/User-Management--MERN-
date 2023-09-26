@@ -20,7 +20,7 @@ const LoginScreen = () => {
 
     const { userInfo } = useSelector(state => state.auth);
 
-    
+
     useEffect(() => {
         if (userInfo) {
             navigate('/');
@@ -30,17 +30,22 @@ const LoginScreen = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
-        try {
-            const res = await login({ email, password }).unwrap();
-            dispatch(setCredentials({ ...res }));
-            navigate('/');
-        } catch (err) {
-            toast.error(err?.data?.message || err.error);
+        if (email.trim().length === 0 || password.trim().length === 0) {
+            toast.error('Enter valid data!');
+        } else {
+            try {
+                const res = await login({ email, password }).unwrap();
+                dispatch(setCredentials({ ...res }));
+                navigate('/');
+            } catch (err) {
+                toast.error(err?.data?.message || err.error);
+            }
         }
+
     };
     return (
         <FormContainer>
-            <h1>Sign In</h1>
+            <h1 className="text-center">Sign In</h1>
 
             <Form onSubmit={submitHandler}>
                 <Form.Group className="my-2" controlId="email">
@@ -73,7 +78,7 @@ const LoginScreen = () => {
 
                 <Row className="py-3">
                     <Col>
-                        New Customer? <Link to='/register'>Register</Link>
+                        New User? <Link to='/register'>Register</Link>
                     </Col>
                 </Row>
             </Form>

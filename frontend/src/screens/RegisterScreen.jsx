@@ -31,7 +31,12 @@ const RegisterScreen = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
-        if (password !== confirmPassword) {
+        if (name.trim().length === 0 || email.trim().length === 0 || password.trim().length === 0) {
+            toast.error("Input fields can't be empty!");
+        } else if (!name.match(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/)) {
+            toast.error("Invalid name!");
+        }
+        else if (password !== confirmPassword) {
             toast.error("Passwords doesn't match!");
         } else {
             try {
@@ -47,7 +52,7 @@ const RegisterScreen = () => {
     };
     return (
         <FormContainer>
-            <h1>Sign Up</h1>
+            <h1 className="text-center">Sign Up</h1>
 
             <Form onSubmit={submitHandler}>
                 <Form.Group className="my-2" controlId="name">
