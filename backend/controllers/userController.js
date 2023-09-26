@@ -4,12 +4,14 @@ import generateToken from '../utils/generateToken.js';
 import cloudinary from 'cloudinary';
 import fs from 'fs';
 import path from 'path';
+import dotenv from 'dotenv'
+dotenv.config()
 
 
 cloudinary.v2.config({
-    cloud_name: 'ddzzicdji',
-    api_key: '212944843593312',
-    api_secret: 'LCrCW_UtqnlAgiTyg7cvPivfZGE',
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET,
     secure: true,
 });
 
@@ -23,11 +25,17 @@ const authUser = asyncHandler(async (req, res) => {
 
     if (user && (await user.matchPassword(password))) {
         generateToken(res, user._id);
-        res.status(201).json({
-            _id: user.id,
+        const response = {
+            _id: user._id,
             name: user.name,
-            email: user.email
-        });
+            email: user.email,
+        };
+
+        if (user.imageUrl) {
+            response.imageUrl = user.imageUrl;
+        }
+
+        res.status(201).json(response);
     } else {
         res.status(401);
         throw new Error('Invalid email or password');
@@ -124,7 +132,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
             response.imageUrl = updatedUser.imageUrl;
         }
 
-        res.status(200).json(response); 
+        res.status(200).json(response);
 
     } else {
         res.status(404);
