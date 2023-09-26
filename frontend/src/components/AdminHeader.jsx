@@ -24,9 +24,9 @@ const AdminHeader = () => {
     };
     return (
         <header>
-            <Navbar bg='dark' variant='dark' expand='lg' collapseOnSelect>
+            <Navbar variant='dark' expand='lg' collapseOnSelect style={{background:'#009e47'}}>
                 <Container>
-                    <LinkContainer to='/'>
+                    <LinkContainer to='/admin'>
                         <Navbar.Brand><h2>ADMIN</h2></Navbar.Brand>
                     </LinkContainer>
                     <Navbar.Toggle aria-controls='basic-navbar-nav' />
@@ -47,9 +47,9 @@ const AdminHeader = () => {
                                             Users
                                         </Nav.Link>
                                     </LinkContainer>
-                                    
-                                            <Button className='btn-secondary ms-lg-5' onClick={logoutHandler}>Logout</Button>
-                                     
+
+                                    <Button className='btn-secondary ms-lg-5' onClick={logoutHandler}>Logout</Button>
+
                                 </>
                             )}
 
