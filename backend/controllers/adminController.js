@@ -5,8 +5,8 @@ import User from '../models/userModel.js';
 import cloudinary from 'cloudinary';
 import fs from 'fs';
 import path from 'path';
-import dotenv from 'dotenv'
-dotenv.config()
+import dotenv from 'dotenv';
+dotenv.config();
 
 cloudinary.v2.config({
     cloud_name: process.env.CLOUDINARY_NAME,
@@ -23,7 +23,7 @@ const authAdmin = asyncHandler(async (req, res) => {
 
     const admin = await Admin.findOne({ email });
     if (admin && (await admin.matchPassword(password))) {
-        generateToken(res, admin._id,'adminJwt');
+        generateToken(res, admin._id, 'adminJwt');
 
         res.status(201).json({
             _id: admin._id,
@@ -89,7 +89,7 @@ const addUsers = asyncHandler(async (req, res) => {
 //@access   Private
 const getUserProfile = asyncHandler(async (req, res) => {
     const userId = req.query.id;
-    const user = await User.findById(userId).select('-password');
+    const user = await User.findOne({ _id: userId }).select('-password');
     if (user) {
         res.status(200).json(user);
     } else {
@@ -103,8 +103,23 @@ const getUserProfile = asyncHandler(async (req, res) => {
 //route     PUT /api/admin/users/update
 //@access   Private
 const updateUserProfile = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.body._id);
+    const user = await User.findById(req.body.id);
+
+
     if (user) {
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path);
+            user.imageUrl = result.secure_url || null;
+
+            const filePath = path.join('backend', 'public', 'images', req.file.filename);
+
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error('Error deleting file:', err);
+                }
+            });
+        }
+
         user.name = req.body.name || user.name;
         user.email = req.body.email || user.email;
 
@@ -120,6 +135,10 @@ const updateUserProfile = asyncHandler(async (req, res) => {
             email: updatedUser.email,
         };
 
+        if (updatedUser.imageUrl) {
+            response.imageUrl = updatedUser.imageUrl;
+        }
+
         res.status(200).json(response);
 
     } else {
@@ -134,7 +153,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 //@access   Private
 const deleteUsers = asyncHandler(async (req, res) => {
     const userId = req.query.id;
-
     if (!userId) {
         res.status(400);
         throw new Error("Invalid user Data");
