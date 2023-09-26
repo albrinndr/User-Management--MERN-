@@ -1,6 +1,17 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import generateToken from '../utils/generateToken.js';
+import cloudinary from 'cloudinary';
+import fs from 'fs';
+import path from 'path';
+
+
+cloudinary.v2.config({
+    cloud_name: 'ddzzicdji',
+    api_key: '212944843593312',
+    api_secret: 'LCrCW_UtqnlAgiTyg7cvPivfZGE',
+    secure: true,
+});
 
 // @desc    Auth user/set token
 //route     POST /api/users/auth
@@ -80,8 +91,20 @@ const getUserProfile = asyncHandler(async (req, res) => {
 //@access   Private
 const updateUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
-
     if (user) {
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path);
+            user.imageUrl = result.secure_url || null;
+
+            const filePath = path.join('backend', 'public', 'images', req.file.filename);
+
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error('Error deleting file:', err);
+                }
+            });
+        }
+
         user.name = req.body.name || user.name;
         user.email = req.body.email || user.email;
 
@@ -91,11 +114,18 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 
         const updatedUser = await user.save();
 
-        res.status(200).json({
+        const response = {
             _id: updatedUser._id,
             name: updatedUser.name,
             email: updatedUser.email,
-        });
+        };
+
+        if (updatedUser.imageUrl) {
+            response.imageUrl = updatedUser.imageUrl;
+        }
+
+        res.status(200).json(response); 
+
     } else {
         res.status(404);
         throw new Error('User not found');

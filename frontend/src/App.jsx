@@ -12,6 +12,7 @@ const App = () => {
       <Container className="my-2">
         <Outlet />
       </Container>
+      {/* <Image /> */}
     </>
   );
 };
