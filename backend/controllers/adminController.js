@@ -23,7 +23,7 @@ const authAdmin = asyncHandler(async (req, res) => {
 
     const admin = await Admin.findOne({ email });
     if (admin && (await admin.matchPassword(password))) {
-        generateToken(res, admin._id);
+        generateToken(res, admin._id,'adminJwt');
 
         res.status(201).json({
             _id: admin._id,
@@ -40,7 +40,7 @@ const authAdmin = asyncHandler(async (req, res) => {
 //route     POST /api/admin/logout
 //@access   Public
 const logoutAdmin = asyncHandler(async (req, res) => {
-    res.cookie('jwt', '', {
+    res.cookie('adminJwt', '', {
         httpOnly: true,
         expires: new Date(0)
     });
